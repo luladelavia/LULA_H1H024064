@@ -1,0 +1,90 @@
+// LED Kendaraan
+const int merahK = 8;
+const int kuningK = 9;
+const int hijauK = 10;
+
+// Pedestrian 1
+const int merahP1 = 11;
+const int hijauP1 = 12;
+
+// Pedestrian 2
+const int merahP2 = 6;
+const int hijauP2 = 7;
+
+// Tombol
+const int tombol = 2;
+
+volatile bool tombolDitekan = false;
+
+void setup() {
+  pinMode(merahK, OUTPUT);
+  pinMode(kuningK, OUTPUT);
+  pinMode(hijauK, OUTPUT);
+
+  pinMode(merahP1, OUTPUT);
+  pinMode(hijauP1, OUTPUT);
+
+  pinMode(merahP2, OUTPUT);
+  pinMode(hijauP2, OUTPUT);
+
+  pinMode(tombol, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(tombol), ISR_tombol, FALLING);
+
+  kondisiAwal();
+}
+
+void loop() {
+  if (tombolDitekan) {
+    tombolDitekan = false;
+
+    // 🚗 Kendaraan merah
+    digitalWrite(hijauK, LOW);
+    digitalWrite(kuningK, LOW);
+    digitalWrite(merahK, HIGH);
+
+    // 🚶 Pedestrian hijau (dua arah)
+    digitalWrite(merahP1, LOW);
+    digitalWrite(hijauP1, HIGH);
+
+    digitalWrite(merahP2, LOW);
+    digitalWrite(hijauP2, HIGH);
+
+    delay(5000); // waktu menyebrang
+
+    // 🚶 Pedestrian merah lagi
+    digitalWrite(hijauP1, LOW);
+    digitalWrite(merahP1, HIGH);
+
+    digitalWrite(hijauP2, LOW);
+    digitalWrite(merahP2, HIGH);
+
+    // 🚗 Kendaraan kuning
+    digitalWrite(merahK, LOW);
+    digitalWrite(kuningK, HIGH);
+
+    delay(2000);
+
+    kondisiAwal();
+  }
+}
+
+// ISR
+void ISR_tombol() {
+  tombolDitekan = true;
+}
+
+// Kondisi awal
+void kondisiAwal() {
+  // Kendaraan hijau
+  digitalWrite(hijauK, HIGH);
+  digitalWrite(kuningK, LOW);
+  digitalWrite(merahK, LOW);
+
+  // Semua pedestrian merah
+  digitalWrite(merahP1, HIGH);
+  digitalWrite(hijauP1, LOW);
+
+  digitalWrite(merahP2, HIGH);
+  digitalWrite(hijauP2, LOW);
+}
